@@ -24,6 +24,7 @@ import net.sf.jsqlparser.statement.create.table.Index;
 import net.sf.jsqlparser.statement.create.table.RowMovementMode;
 import net.sf.jsqlparser.test.TestException;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -969,6 +970,20 @@ public class CreateTableTest {
                 true);
     }
 
+    @Test
+    void testCreateTableBytesColumnNoParam() throws JSQLParserException {
+        String ddl = "CREATE TABLE TEST (BLB1 BYTES, BLB2 BYTES(123), BLB3 BYTES NOT NULL)";
+        CreateTable createTable = (CreateTable) assertSqlCanBeParsedAndDeparsed(ddl, true);
+        List<ColumnDefinition> cols = createTable.getColumnDefinitions();
+        assertEquals(3, cols.size());
+        assertEquals("BLB1", cols.get(0).getColumnName());
+        assertEquals("BYTES", cols.get(0).getColDataType().getDataType());
+        assertEquals("BLB2", cols.get(1).getColumnName());
+        assertEquals("BYTES (123)", cols.get(1).getColDataType().getDataType());
+        assertEquals("BLB3", cols.get(2).getColumnName());
+        assertEquals("BYTES", cols.get(2).getColDataType().getDataType());
+        assertEquals(Lists.list("NOT", "NULL"), cols.get(2).getColumnSpecs());
+    }
 
     @Test
     void testCreateTableWithStartWithNumber() throws JSQLParserException {
